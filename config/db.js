@@ -5,6 +5,13 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+pool.on("error", (err, client) => {
+  console.error(
+    "Error inesperado en un cliente inactivo de la base de datos:",
+    err.message,
+  );
+});
+
 pool
   .connect()
   .then(() => console.log("✅ Conectado exitosamente a PostgreSQL en Neon"))
