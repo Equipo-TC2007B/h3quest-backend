@@ -25,7 +25,3 @@ module.exports = {
   getPreguntasByQuest,
 };
 
-module.exports = {
-  getAllQuests,
-};
-
