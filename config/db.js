@@ -17,7 +17,7 @@ pool.on("error", (err, client) => {
 
 pool
   .connect()
-  .then(() => console.log("✅ Conectado exitosamente a PostgreSQL en Neon"))
+  .then(() => console.log("✅ Conectado exitosamente a PostgreSQL en GCP"))
   .catch((err) =>
     console.error("❌ Error de conexión a la base de datos", err.stack),
   );

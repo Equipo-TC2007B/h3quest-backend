@@ -41,11 +41,23 @@ const registerUser = async (userData) => {
 
     return { token, usuario: nuevoUsuario };
   } catch (error) {
+    console.error("Error de BD en registerUser:", error);
+
     if (error.code === "23505") {
-      throw {
-        status: 409,
-        message: "Este correo electrónico ya se encuentra registrado.",
-      };
+      if (
+        error.constraint === "usuario_email_key" ||
+        error.constraint === "usuario_email_unique"
+      ) {
+        throw {
+          status: 409,
+          message: "Este correo electrónico ya se encuentra registrado.",
+        };
+      } else {
+        throw {
+          status: 500,
+          message: `Conflicto en la base de datos (Restricción: ${error.constraint}). Avisa a soporte.`,
+        };
+      }
     }
     throw error;
   }
