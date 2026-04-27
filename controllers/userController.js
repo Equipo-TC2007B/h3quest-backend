@@ -29,7 +29,7 @@ const loginUser = async (req, res) => {
       usuario,
     });
   } catch (error) {
-    console.error("❌ Error en loginUser:", error);
+    console.error("Error en loginUser:", error);
     const status = error.status || 500;
     const message = error.message || "Error interno del servidor.";
     res.status(status).json({ error: message });
