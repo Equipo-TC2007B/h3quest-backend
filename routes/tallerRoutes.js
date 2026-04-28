@@ -17,6 +17,7 @@ router.get("/", tallerController.getTalleres);
 
 // POST y PUT privados (Solo Admins)
 router.post("/", verificarToken, verificarAdmin, tallerController.addTaller);
+
 router.put(
   "/:id/toggle",
   verificarToken,
@@ -24,7 +25,10 @@ router.put(
   tallerController.toggleTaller,
 );
 
-// DELETE privado (Solo Admins)
+// PUT privado para editar título y horario
+router.put("/:id", verificarToken, verificarAdmin, tallerController.editTaller);
+
+// DELETE privado para borrar por completo
 router.delete(
   "/:id",
   verificarToken,
