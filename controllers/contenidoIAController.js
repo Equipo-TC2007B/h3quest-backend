@@ -2,7 +2,6 @@ const preguntasService = require("../services/contenidoIAService");
 
 const getContenidoIA = async (req, res) => {
   try {
-    const { id_quest } = req.query;
 
     /*
     const contenidoIA = await contenidoIAService.getContenidoIAByQuest(
