@@ -5,6 +5,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/userRoutes");
 const questRoutes = require("./routes/questRoutes");
 const preguntasRoutes = require("./routes/preguntasRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/quests", questRoutes);
 app.use("/api/preguntas", preguntasRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Ruta de prueba base
 app.get("/", (req, res) => {
