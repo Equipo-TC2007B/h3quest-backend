@@ -6,6 +6,7 @@ const userRoutes = require("./routes/userRoutes");
 const questRoutes = require("./routes/questRoutes");
 const preguntasRoutes = require("./routes/preguntasRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const contenidoIARoutes = require("./routes/contenidoIARoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/quests", questRoutes);
 app.use("/api/preguntas", preguntasRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/contenidoia", contenidoIARoutes);
 
 // Ruta de prueba base
 app.get("/", (req, res) => {
