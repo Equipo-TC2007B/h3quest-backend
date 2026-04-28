@@ -31,6 +31,22 @@ router.get("/perfil", verificarToken, async (req, res) => {
 
     const u = result.rows[0];
 
+    const insigniasQuery = `
+      SELECT i.id_insignia, i.nombre, i.descripcion, i.icono, i.puntos_requeridos,
+             CASE WHEN ui.id_insignia IS NOT NULL THEN true ELSE false END as obtenida 
+      FROM insignia i
+      LEFT JOIN usuario_insignia ui ON i.id_insignia = ui.id_insignia AND ui.id_usuario = $1
+      ORDER BY i.puntos_requeridos ASC;
+    `;
+    const insigniasResult = await pool.query(insigniasQuery, [
+      req.usuario.id_usuario,
+    ]);
+
+    const misionesQuery = `SELECT COUNT(*) as completadas FROM progreso_quest WHERE id_usuario = $1`;
+    const misionesResult = await pool.query(misionesQuery, [
+      req.usuario.id_usuario,
+    ]);
+
     const usuarioCompleto = {
       id_usuario: u.id_usuario,
       nombre: u.nombre || "Sin Nombre",
@@ -39,8 +55,9 @@ router.get("/perfil", verificarToken, async (req, res) => {
       edad: u.edad,
       fecha_registro: u.fecha_registro ? u.fecha_registro.toISOString() : null,
       puntosTotales: u.puntos || 0,
-      misionesCompletadas: 0,
+      misionesCompletadas: parseInt(misionesResult.rows[0].completadas) || 0,
       rango: "Explorador de Acero",
+      insignias: insigniasResult.rows,
     };
 
     res.status(200).json({
