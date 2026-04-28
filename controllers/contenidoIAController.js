@@ -17,7 +17,8 @@ const getContenidoIA = async (req, res) => {
     });
   } catch (error) {
     console.error("Error en getContenidoIA:", error);
-    res.status(500).json({ error: "Error interno al obtener el contenidoIA." });
+    //res.status(500).json({ error: "Error interno al obtener el contenidoIA." });
+    res.status(500).json({ error: error});
   }
 };
 
