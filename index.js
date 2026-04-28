@@ -6,6 +6,7 @@ const userRoutes = require("./routes/userRoutes");
 const questRoutes = require("./routes/questRoutes");
 const preguntasRoutes = require("./routes/preguntasRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const contenidoIARoutes = require("./routes/contenidoIARoutes");
 const tallerRoutes = require("./routes/tallerRoutes");
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/quests", questRoutes);
 app.use("/api/preguntas", preguntasRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/contenidoia", contenidoIARoutes);
 app.use("/api/talleres", tallerRoutes);
 
 // Ruta de prueba base

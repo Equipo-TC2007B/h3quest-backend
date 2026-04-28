@@ -15,7 +15,7 @@ const getPreguntas = async (req, res) => {
     });
   } catch (error) {
     console.error("Error en getPreguntas:", error);
-    res.status(500).json({ error: "Error interno al obtener los preguntas." });
+    res.status(500).json({ error: "Error interno al obtener las preguntas." });
   }
 };
 
