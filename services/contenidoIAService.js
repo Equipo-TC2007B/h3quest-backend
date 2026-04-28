@@ -4,7 +4,8 @@ const getAllContenidoIA = async () => {
   const query = `
     SELECT *
     FROM contenidos_ia
-    ORDER BY id_quest ASC;
+    ORDER BY RANDOM()
+    LIMIT 10
   `;
 
   const result = await pool.query(query);
