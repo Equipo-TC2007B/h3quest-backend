@@ -33,6 +33,18 @@ const toggleTallerStatus = async (id_taller, activa) => {
   return result.rows[0];
 };
 
+// Actualizar título y horario de un taller
+const updateTaller = async (id_taller, titulo, horario) => {
+  const query = `
+    UPDATE taller 
+    SET titulo = $1, horario = $2 
+    WHERE id_taller = $3 
+    RETURNING *;
+  `;
+  const result = await pool.query(query, [titulo, horario, id_taller]);
+  return result.rows[0];
+};
+
 // Borrar un taller
 const deleteTaller = async (id_taller) => {
   const query = `DELETE FROM taller WHERE id_taller = $1 RETURNING *;`;
@@ -45,5 +57,6 @@ module.exports = {
   getTalleresActivos,
   createTaller,
   toggleTallerStatus,
+  updateTaller,
   deleteTaller,
 };

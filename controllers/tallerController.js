@@ -40,13 +40,25 @@ const toggleTaller = async (req, res) => {
   }
 };
 
+const editTaller = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, horario } = req.body;
+    if (!titulo || !horario) {
+      return res.status(400).json({ error: "Título y horario requeridos." });
+    }
+    const actualizado = await tallerService.updateTaller(id, titulo, horario);
+    res.status(200).json(actualizado);
+  } catch (error) {
+    console.error("Error al actualizar taller:", error);
+    res.status(500).json({ error: "Error al actualizar taller." });
+  }
+};
+
 const removeTaller = async (req, res) => {
   try {
     const { id } = req.params;
-    const eliminado = await tallerService.deleteTaller(id);
-    if (!eliminado) {
-      return res.status(404).json({ error: "Taller no encontrado." });
-    }
+    await tallerService.deleteTaller(id);
     res.status(200).json({ mensaje: "Taller eliminado con éxito." });
   } catch (error) {
     console.error("Error al eliminar taller:", error);
@@ -54,4 +66,10 @@ const removeTaller = async (req, res) => {
   }
 };
 
-module.exports = { getTalleres, addTaller, toggleTaller, removeTaller };
+module.exports = {
+  getTalleres,
+  addTaller,
+  toggleTaller,
+  editTaller,
+  removeTaller,
+};
