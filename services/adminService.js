@@ -23,6 +23,15 @@ const registrarProgresoQuest = async (
       [id_usuario, id_quest, puntos_obtenidos],
     );
 
+    await client.query(
+      `INSERT INTO usuario_insignia (id_usuario, id_insignia, fecha_obtenida)
+       SELECT $1, id_insignia, CURRENT_TIMESTAMP
+       FROM insignia
+       WHERE puntos_requeridos <= (SELECT puntos FROM usuario WHERE id_usuario = $1)
+       ON CONFLICT (id_usuario, id_insignia) DO NOTHING;`,
+      [id_usuario],
+    );
+
     await client.query("COMMIT");
     return { success: true };
   } catch (error) {
