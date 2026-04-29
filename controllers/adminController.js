@@ -42,7 +42,20 @@ const getMetrics = async (req, res) => {
   }
 };
 
+const getEstadisticasEdades = async (req, res) => {
+  try {
+    const estadisticas = await adminService.getDistribucionEdades();
+    res.status(200).json(estadisticas);
+  } catch (error) {
+    console.error("Error al obtener estadísticas de edades:", error);
+    res
+      .status(500)
+      .json({ error: "Error interno al obtener estadísticas de edades." });
+  }
+};
+
 module.exports = {
   completarQuest,
   getMetrics,
+  getEstadisticasEdades,
 };

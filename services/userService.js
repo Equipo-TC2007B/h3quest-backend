@@ -4,8 +4,15 @@ const jwt = require("jsonwebtoken");
 
 /// Registra un nuevo usuario en la base de datos y genera su token de acceso
 const registerUser = async (userData) => {
-  const { nombre, email, contrasena, tipo_usuario, edad, idioma_preferido } =
-    userData;
+  const {
+    nombre,
+    email,
+    contrasena,
+    tipo_usuario,
+    edad,
+    idioma_preferido,
+    dateofbirth,
+  } = userData;
 
   if (!nombre || !email || !contrasena) {
     throw {
@@ -17,7 +24,7 @@ const registerUser = async (userData) => {
   const saltRounds = 10;
   const contrasenaHash = await bcrypt.hash(contrasena, saltRounds);
 
-  const query = `SELECT * FROM sp_crear_usuario($1, $2, $3, $4, $5, $6);`;
+  const query = `SELECT * FROM sp_crear_usuario($1, $2, $3, $4, $5, $6, $7);`;
   const values = [
     nombre,
     email,
@@ -25,6 +32,7 @@ const registerUser = async (userData) => {
     tipo_usuario || "visitante",
     edad || null,
     idioma_preferido || null,
+    dateofbirth || null,
   ];
 
   try {
@@ -96,7 +104,45 @@ const authenticateUser = async (credentials) => {
   return { token, usuario };
 };
 
+const getUserProfileData = async (id_usuario) => {
+  try {
+    const userQuery = `
+      SELECT id_usuario, nombre, email, puntos_totales, edad, idioma_preferido, tipo_usuario 
+      FROM usuario 
+      WHERE id_usuario = $1;
+    `;
+    const userResult = await pool.query(userQuery, [id_usuario]);
+
+    if (userResult.rows.length === 0) {
+      throw { status: 404, message: "Usuario no encontrado." };
+    }
+
+    const usuario = userResult.rows[0];
+
+    const badgeQuery = `
+      SELECT i.nombre 
+      FROM insignia_usuario iu
+      JOIN insignia i ON iu.id_insignia = i.id_insignia
+      WHERE iu.id_usuario = $1
+      ORDER BY iu.fecha_obtencion DESC
+      LIMIT 1;
+    `;
+    const badgeResult = await pool.query(badgeQuery, [id_usuario]);
+
+    usuario.rango =
+      badgeResult.rows.length > 0
+        ? badgeResult.rows[0].nombre
+        : "Aprendiz del Carbón";
+
+    return usuario;
+  } catch (error) {
+    console.error("Error en getUserProfileData:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   registerUser,
   authenticateUser,
+  getUserProfileData,
 };
