@@ -8,4 +8,10 @@ const questController = require("../controllers/questController");
 // Ruta: GET /api/quests
 router.get("/", questController.getQuests);
 
+router.post(
+  "/:id/completar",
+  verificarToken,
+  questController.completarQuestUsuario,
+);
+
 module.exports = router;
