@@ -22,6 +22,9 @@ const completarQuest = async (req, res) => {
       .json({ mensaje: "Progreso guardado y puntos actualizados con éxito." });
   } catch (error) {
     console.error("Error al completar quest:", error);
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
     res.status(500).json({ error: "Error interno al actualizar progreso." });
   }
 };
@@ -33,11 +36,9 @@ const getMetrics = async (req, res) => {
     res.status(200).json(metrics);
   } catch (error) {
     console.error("Error al obtener métricas:", error);
-    res
-      .status(500)
-      .json({
-        error: "Error interno al obtener las estadísticas del dashboard.",
-      });
+    res.status(500).json({
+      error: "Error interno al obtener las estadísticas del dashboard.",
+    });
   }
 };
 

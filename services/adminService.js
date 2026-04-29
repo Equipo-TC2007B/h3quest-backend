@@ -36,6 +36,13 @@ const registrarProgresoQuest = async (
     return { success: true };
   } catch (error) {
     await client.query("ROLLBACK");
+    if (error.code === "23505") {
+      throw {
+        status: 400,
+        message:
+          "Ya has completado este Quest. Vuelve mañana para un nuevo desafío.",
+      };
+    }
     throw error;
   } finally {
     client.release();
