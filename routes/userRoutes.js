@@ -19,7 +19,9 @@ router.post("/login", userController.loginUser);
 router.get("/perfil", verificarToken, async (req, res) => {
   try {
     const query = `
-      SELECT id_usuario, nombre, email, tipo_usuario, edad, fecha_registro, puntos 
+      SELECT id_usuario, nombre, email, tipo_usuario, 
+             COALESCE(edad, date_part('year', age(dateofbirth)))::int as edad, 
+             dateofbirth, fecha_registro, puntos 
       FROM usuario 
       WHERE id_usuario = $1
     `;

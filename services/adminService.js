@@ -62,10 +62,12 @@ const getAdminMetrics = async () => {
   `;
 
   const edadesQuery = `
-    SELECT edad, COUNT(*) as cantidad 
+    SELECT 
+      COALESCE(edad, date_part('year', age(dateofbirth)))::int AS edad, 
+      COUNT(*) as cantidad 
     FROM usuario 
-    WHERE edad IS NOT NULL 
-    GROUP BY edad 
+    WHERE edad IS NOT NULL OR dateofbirth IS NOT NULL 
+    GROUP BY COALESCE(edad, date_part('year', age(dateofbirth)))::int
     ORDER BY edad;
   `;
 
@@ -84,7 +86,27 @@ const getAdminMetrics = async () => {
   };
 };
 
+const getDistribucionEdades = async () => {
+  const query = `
+    SELECT 
+        CASE 
+            WHEN date_part('year', age(dateofbirth)) < 12 THEN 'Niños'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 12 AND 17 THEN 'Adolescentes'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 18 AND 29 THEN 'Jóvenes'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 30 AND 55 THEN 'Adultos'
+            ELSE 'Adultos Mayores'
+        END AS categoria,
+        COUNT(*) as total
+    FROM usuario
+    WHERE dateofbirth IS NOT NULL
+    GROUP BY categoria;
+  `;
+  const result = await pool.query(query);
+  return result.rows;
+};
+
 module.exports = {
   registrarProgresoQuest,
   getAdminMetrics,
+  getDistribucionEdades,
 };

@@ -20,6 +20,13 @@ const verificarAdmin = (req, res, next) => {
 // Guardar progreso de quests
 router.post("/completar", verificarToken, adminController.completarQuest);
 
+router.get(
+  "/estadisticas/edades",
+  verificarToken,
+  verificarAdmin,
+  adminController.getEstadisticasEdades,
+);
+
 // Ver gráficas y métricas (SOLO administradores)
 router.get(
   "/metrics",
