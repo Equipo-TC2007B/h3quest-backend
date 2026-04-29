@@ -90,16 +90,17 @@ const getDistribucionEdades = async () => {
   const query = `
     SELECT 
         CASE 
-            WHEN date_part('year', age(dateofbirth)) < 12 THEN 'Niños'
-            WHEN date_part('year', age(dateofbirth)) BETWEEN 12 AND 17 THEN 'Adolescentes'
-            WHEN date_part('year', age(dateofbirth)) BETWEEN 18 AND 29 THEN 'Jóvenes'
-            WHEN date_part('year', age(dateofbirth)) BETWEEN 30 AND 55 THEN 'Adultos'
-            ELSE 'Adultos Mayores'
+            WHEN date_part('year', age(dateofbirth)) < 12 THEN '0-11 años'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 12 AND 17 THEN '12-17 años'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 18 AND 29 THEN '18-29 años'
+            WHEN date_part('year', age(dateofbirth)) BETWEEN 30 AND 55 THEN '30-55 años'
+            ELSE '56+ años'
         END AS categoria,
         COUNT(*) as total
     FROM usuario
     WHERE dateofbirth IS NOT NULL
-    GROUP BY categoria;
+    GROUP BY categoria
+    ORDER BY MIN(date_part('year', age(dateofbirth)));
   `;
   const result = await pool.query(query);
   return result.rows;
