@@ -11,14 +11,15 @@ Este repositorio contiene la API RESTful para el proyecto **Horno Quest**, la ap
 - **Despliegue (Hosting):** Vercel (Serverless Functions)
 - **Gestión de Entorno:** dotenv
 
-## 🏗️ Arquitectura del Proyecto
+## Arquitectura del Proyecto
 
 El proyecto sigue un patrón de arquitectura en capas (Layered Architecture) para garantizar la separación de responsabilidades, la escalabilidad y un código limpio.
 ```text
 h3quest-backend/
 ├── config/         # Configuración de la base de datos (pg) y variables de entorno.
 ├── controllers/    # Lógica de manejo de peticiones HTTP (req, res). Delegan el trabajo a los servicios.
-├── routes/         # Definición de endpoints de la API y vinculación con los controladores.
+├── middlewares/    # Funciones intermedias (ej. authMiddleware) para verificar tokens y roles antes de llegar al controlador.
+├── routes/         # Definición de endpoints de la API y vinculación con los middlewares y controladores.
 ├── services/       # Reglas de negocio puras e interacciones con la base de datos (Postgres).
 ├── index.js        # Punto de entrada de la aplicación y configuración global de Express / Vercel.
 ├── package.json    # Dependencias y scripts del proyecto.
@@ -26,33 +27,33 @@ h3quest-backend/
 
 ## Endpoints de la API
 
-A continuación se listan las rutas principales de la aplicación, agrupadas por módulo y especificando su nivel de acceso.
+A continuación se listan las rutas de la aplicación. 
 
-> **Nota sobre autenticación:** 
-> - **Privado:** Requiere enviar un header `Authorization: Bearer <tu_token>`.
-> - **Admin:** Requiere un token válido y que el usuario tenga el rol `tipo_usuario === "admin"`.
+> **Nota sobre autenticación (`middlewares/authMiddleware.js`):** 
+> - **Rutas Privadas:** Requieren enviar un token JWT válido en los encabezados HTTP bajo el formato: `Authorization: Bearer <tu_token>`.
+> - **Rutas Admin:** Pasan por el middleware de autenticación (para verificar que el usuario exista y el token sea válido) y posteriormente validan en la ruta que el usuario tenga el rol `tipo_usuario === "admin"`.
 
 ### Usuarios (`/api/users`)
-*   `POST /api/users/register`: Público. Crea y registra un nuevo usuario en la base de datos[cite: 6].
-*   `POST /api/users/login`: Público. Autentica al usuario y devuelve el JWT[cite: 6].
-*   `GET /api/users/perfil`: Privado. Obtiene el perfil completo del usuario autenticado, incluyendo su información básica, insignias obtenidas, rango ("Explorador de Acero") y conteo de misiones completadas[cite: 6].
+*   `POST /api/users/register`: **Público**. Crea y registra un nuevo usuario en la base de datos.
+*   `POST /api/users/login`: **Público**. Autentica al usuario y devuelve el JWT.
+*   `GET /api/users/perfil`: **Privado**. Requiere token. Obtiene el perfil completo del usuario autenticado (`req.usuario.id_usuario`), incluyendo su información básica, insignias obtenidas, rango ("Explorador de Acero") y conteo de misiones completadas.
 
-### Quests y Progreso (`/api/quests` y rutas de admin)
-*   `GET /api/quests`: Público. Obtiene la lista de misiones (quests) disponibles[cite: 4].
-*   `POST /api/quests/:id/completar`: Privado. Registra que el usuario autenticado completó un quest en específico[cite: 4].
-*   `POST /completar`: Privado. Guarda el progreso general de los quests del usuario[cite: 1].
+### Quests y Progreso (`/api/quests` y generales)
+*   `GET /api/quests`: **Público**. Obtiene la lista de misiones (quests) disponibles.
+*   `POST /api/quests/:id/completar`: **Privado**. Requiere token. Registra en el sistema que el usuario autenticado completó un quest en específico.
+*   `POST /completar`: **Privado**. Requiere token. Guarda el progreso general de los quests del usuario.
 
 ### Talleres (`/api/talleres`)
-*   `GET /api/talleres`: Público. Obtiene el listado de talleres[cite: 5].
-*   `POST /api/talleres`: Admin. Crea un nuevo taller en el sistema[cite: 5].
-*   `PUT /api/talleres/:id`: Admin. Edita el título y el horario de un taller existente[cite: 5].
-*   `PUT /api/talleres/:id/toggle`: Admin. Cambia o alterna el estado de visibilidad/activación de un taller[cite: 5].
-*   `DELETE /api/talleres/:id`: Admin. Elimina un taller por completo de la base de datos[cite: 5].
+*   `GET /api/talleres`: **Público**. Obtiene el listado de talleres disponibles.
+*   `POST /api/talleres`: **Admin**. Crea un nuevo taller en el sistema.
+*   `PUT /api/talleres/:id`: **Admin**. Edita el título y el horario de un taller existente.
+*   `PUT /api/talleres/:id/toggle`: **Admin**. Cambia o alterna el estado de visibilidad/activación de un taller.
+*   `DELETE /api/talleres/:id`: **Admin**. Elimina un taller de forma permanente.
 
-### Administración y Métricas (Rutas protegidas)
-*   `GET /estadisticas/edades`: Admin. Devuelve las estadísticas demográficas (edades) de los usuarios registrados[cite: 1].
-*   `GET /metrics`: Admin. Devuelve datos y métricas generales para la visualización de gráficas en el dashboard[cite: 1].
+### Administración y Métricas
+*   `GET /estadisticas/edades`: **Admin**. Devuelve las estadísticas demográficas (edades) de los usuarios registrados para el panel de administración.
+*   `GET /metrics`: **Admin**. Devuelve datos y métricas generales para las gráficas del dashboard de administración.
 
 ### Contenido Educativo
-*   `GET /api/contenidoia`: Público (o Privado, según configuración de middleware). Obtiene el contenido generado o gestionado por inteligencia artificial[cite: 2].
-*   `GET /api/preguntas`: Público (o Privado, según configuración de middleware). Devuelve la lista de preguntas utilizadas en las trivias y quests[cite: 3].
+*   `GET /api/contenidoia`: **Público**. Obtiene el contenido generado o gestionado por inteligencia artificial para la app.
+*   `GET /api/preguntas`: **Público**. Devuelve la lista de preguntas utilizadas en las trivias y misiones.
